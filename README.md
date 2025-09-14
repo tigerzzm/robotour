@@ -15,6 +15,7 @@ A computer vision-based navigation system for a Raspberry Pi Zero 2W robotic veh
 - Pi Camera Module
 - Motor driver (L298N - see L298N_setup_guide.md for detailed wiring)
 - 2 DC motors with wheels (130-type geared motors recommended)
+- Push button for start/stop control
 - Chassis/frame for the robot
 - Power supply (12V battery + LM2596S buck converter recommended)
 
@@ -59,6 +60,14 @@ Connect your L298N driver to the GPIO pins as defined in `config.py`:
 - IN4 (Right Motor Backward): GPIO 25
 
 **See `L298N_setup_guide.md` for detailed wiring instructions and troubleshooting.**
+
+### Push Button Setup
+- **GPIO Pin**: 16 (configurable)
+- **Type**: Momentary push button (normally open)
+- **Function**: Start navigation and emergency stop
+- **Logic**: Active LOW (pressed = 0V, released = 3.3V)
+
+**See `button_wiring_guide.md` for detailed button wiring instructions.**
 
 ### Power Supply Setup (LM2596S Buck Converter)
 - **Input**: 12V battery (4-40V range supported)
@@ -110,6 +119,11 @@ python3 calibrate_50cm_grid.py
 python3 power_monitor.py
 ```
 
+#### Test Push Button
+```bash
+python3 test_button.py
+```
+
 ## Configuration
 
 Edit `config.py` to adjust:
@@ -134,7 +148,10 @@ robotour/
 ├── calibrate_50cm_grid.py # 50cm grid calibration tool
 ├── L298N_setup_guide.md   # Detailed L298N wiring guide
 ├── LM2596S_power_guide.md # LM2596S power management guide
+├── button_wiring_guide.md # Push button wiring guide
 ├── power_monitor.py       # Power monitoring utility
+├── button_controller.py   # Push button control
+├── test_button.py         # Button testing script
 ├── requirements.txt       # Python dependencies
 ├── setup.sh              # Setup script
 └── README.md             # This file
@@ -169,6 +186,13 @@ robotour/
 - Monitor current draw (keep under 2A)
 - Check for overheating (add heat sink if needed)
 - See `LM2596S_power_guide.md` for detailed troubleshooting
+
+### Button Issues
+- Check button wiring (GPIO 16 to GND)
+- Verify button type (normally open)
+- Test with multimeter (should be open when not pressed)
+- Check for loose connections
+- See `button_wiring_guide.md` for detailed troubleshooting
 
 ### Grid Detection Issues
 - Ensure good contrast between grid lines and background

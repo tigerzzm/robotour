@@ -26,6 +26,10 @@ L298N_VOLTAGE_DROP = 2.0  # Voltage drop across L298N (typical)
 L298N_MAX_CURRENT = 2.0   # Maximum current per channel (A)
 L298N_ENABLE_PINS = [12, 13]  # ENA, ENB pins (optional PWM control)
 
+# Push button configuration
+START_BUTTON_PIN = 16  # GPIO pin for start button (with pull-up resistor)
+BUTTON_DEBOUNCE_TIME = 0.1  # seconds to debounce button press
+
 # LM2596S DC Buck Converter specifications
 LM2596S_INPUT_VOLTAGE_MIN = 4.0   # Minimum input voltage (V)
 LM2596S_INPUT_VOLTAGE_MAX = 40.0  # Maximum input voltage (V)

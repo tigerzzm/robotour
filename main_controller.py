@@ -9,6 +9,7 @@ import sys
 from motor_controller import MotorController
 from camera_controller import CameraController
 from navigation_controller import NavigationController
+from button_controller import ButtonController
 from config import *
 
 class RobotController:
@@ -17,6 +18,7 @@ class RobotController:
         self.motor_controller = MotorController()
         self.camera_controller = CameraController()
         self.navigation_controller = NavigationController()
+        self.button_controller = ButtonController()
         
         self.running = False
         self.paused = False
@@ -35,17 +37,30 @@ class RobotController:
     
     def start(self):
         """Start the main control loop."""
+        print("🤖 Robotic Vehicle Navigation System")
+        print("=" * 40)
+        
+        # Wait for start button press
+        if not self.button_controller.wait_for_button_press():
+            print("Starting automatically...")
+        
         print("Starting robot navigation...")
         self.running = True
         
         try:
             while self.running and not self.navigation_controller.is_navigation_complete():
+                # Check for emergency stop
+                if self.button_controller.check_emergency_stop():
+                    print("🛑 Emergency stop activated!")
+                    self.stop()
+                    break
+                
                 if not self.paused:
                     self.navigation_step()
                 time.sleep(0.1)  # Small delay to prevent excessive CPU usage
             
             if self.navigation_controller.is_navigation_complete():
-                print("Navigation completed successfully!")
+                print("🎉 Navigation completed successfully!")
                 self.play_completion_sound()
             
         except Exception as e:
@@ -147,6 +162,7 @@ class RobotController:
         print("Cleaning up resources...")
         self.motor_controller.cleanup()
         self.camera_controller.cleanup()
+        self.button_controller.cleanup()
         print("Cleanup completed")
 
 def main():
