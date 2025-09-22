@@ -32,7 +32,7 @@ ENB_PIN = 17  # GPIO pin for ENB (Right Motor Enable)
 USE_ENABLE_PINS = True  # Set to True to use ENA/ENB, False for direct PWM
 
 # Motor direction correction (if motors rotate in wrong direction)
-REVERSE_LEFT_MOTOR = False   # Set to True if left motor rotates backward when it should go forward
+REVERSE_LEFT_MOTOR = True    # Set to True if left motor rotates backward when it should go forward
 REVERSE_RIGHT_MOTOR = True   # Set to True if right motor rotates backward when it should go forward
 
 # Push button configuration
