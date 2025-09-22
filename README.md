@@ -54,12 +54,14 @@ A computer vision-based navigation system for a Raspberry Pi Zero 2W robotic veh
 ### Motor Connections (L298N Driver)
 Connect your L298N driver to the GPIO pins as defined in `config.py`:
 
+- ENA (Left Motor Speed): GPIO 14
+- ENB (Right Motor Speed): GPIO 17
 - IN1 (Left Motor Forward): GPIO 18
-- IN2 (Left Motor Backward): GPIO 23
-- IN3 (Right Motor Forward): GPIO 24
-- IN4 (Right Motor Backward): GPIO 25
+- IN2 (Left Motor Backward): GPIO 15
+- IN3 (Right Motor Forward): GPIO 22
+- IN4 (Right Motor Backward): GPIO 27
 
-**See `L298N_setup_guide.md` for detailed wiring instructions and troubleshooting.**
+**See `L298N_setup_guide.md` and `ena_enb_wiring_guide.md` for detailed wiring instructions and troubleshooting.**
 
 ### Push Button Setup
 - **GPIO Pin**: 16 (configurable)
@@ -109,6 +111,11 @@ python3 test_motors.py
 python3 test_geared_motors.py
 ```
 
+#### Test ENA/ENB Motor Control
+```bash
+python3 test_ena_enb.py
+```
+
 #### Calibrate for 50cm Grid
 ```bash
 python3 calibrate_50cm_grid.py
@@ -145,8 +152,10 @@ robotour/
 ├── test_camera.py         # Camera testing script
 ├── test_motors.py         # Motor testing script
 ├── test_geared_motors.py  # Geared motor testing script
+├── test_ena_enb.py        # ENA/ENB motor control testing
 ├── calibrate_50cm_grid.py # 50cm grid calibration tool
 ├── L298N_setup_guide.md   # Detailed L298N wiring guide
+├── ena_enb_wiring_guide.md # ENA/ENB wiring and control guide
 ├── LM2596S_power_guide.md # LM2596S power management guide
 ├── button_wiring_guide.md # Push button wiring guide
 ├── power_monitor.py       # Power monitoring utility

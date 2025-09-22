@@ -19,11 +19,11 @@ L298N Motor Driver Module:
 | L298N Pin | GPIO Pin | Function | Description |
 |-----------|----------|----------|-------------|
 | IN1 | GPIO 18 | Left Motor Forward | Controls left motor forward direction |
-| IN2 | GPIO 23 | Left Motor Backward | Controls left motor backward direction |
-| IN3 | GPIO 24 | Right Motor Forward | Controls right motor forward direction |
-| IN4 | GPIO 25 | Right Motor Backward | Controls right motor backward direction |
-| ENA | GPIO 12 | Left Motor Enable | PWM speed control for left motor (optional) |
-| ENB | GPIO 13 | Right Motor Enable | PWM speed control for right motor (optional) |
+| IN2 | GPIO 15 | Left Motor Backward | Controls left motor backward direction |
+| IN3 | GPIO 22 | Right Motor Forward | Controls right motor forward direction |
+| IN4 | GPIO 27 | Right Motor Backward | Controls right motor backward direction |
+| ENA | GPIO 14 | Left Motor Enable | PWM speed control for left motor (optional) |
+| ENB | GPIO 17 | Right Motor Enable | PWM speed control for right motor (optional) |
 | +5V | 5V | Power | 5V power from Pi (for L298N logic) |
 | GND | GND | Ground | Common ground |
 | +12V | 6V Battery | Motor Power | 6V battery for motors |

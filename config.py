@@ -17,14 +17,19 @@ GRID_CELL_SIZE = 100  # pixels (approximate in camera view)
 # L298N has 4 input pins: IN1, IN2, IN3, IN4
 # IN1, IN2 control Motor A (Left), IN3, IN4 control Motor B (Right)
 MOTOR_LEFT_FORWARD = 18   # IN1 on L298N
-MOTOR_LEFT_BACKWARD = 23  # IN2 on L298N
-MOTOR_RIGHT_FORWARD = 24  # IN3 on L298N
-MOTOR_RIGHT_BACKWARD = 25 # IN4 on L298N
+MOTOR_LEFT_BACKWARD = 15  # IN2 on L298N
+MOTOR_RIGHT_FORWARD = 22  # IN3 on L298N
+MOTOR_RIGHT_BACKWARD = 27 # IN4 on L298N
 
 # L298N Driver specifications
 L298N_VOLTAGE_DROP = 2.0  # Voltage drop across L298N (typical)
 L298N_MAX_CURRENT = 2.0   # Maximum current per channel (A)
-L298N_ENABLE_PINS = [12, 13]  # ENA, ENB pins (optional PWM control)
+L298N_ENABLE_PINS = [14, 17]  # ENA, ENB pins (optional PWM control)
+
+# L298N Enable pins for dual-level PWM control
+ENA_PIN = 14  # GPIO pin for ENA (Left Motor Enable)
+ENB_PIN = 17  # GPIO pin for ENB (Right Motor Enable)
+USE_ENABLE_PINS = True  # Set to True to use ENA/ENB, False for direct PWM
 
 # Push button configuration
 START_BUTTON_PIN = 16  # GPIO pin for start button (with pull-up resistor)
