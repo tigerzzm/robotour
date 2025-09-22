@@ -92,16 +92,37 @@ class MotorController:
             # ENA/ENB method: Set speed on enable pins, direction on input pins
             self.ena_pwm.ChangeDutyCycle(speed)
             self.enb_pwm.ChangeDutyCycle(speed)
-            self.left_forward_pin.ChangeDutyCycle(100)  # HIGH
-            self.left_backward_pin.ChangeDutyCycle(0)   # LOW
-            self.right_forward_pin.ChangeDutyCycle(100) # HIGH
-            self.right_backward_pin.ChangeDutyCycle(0)  # LOW
+            
+            # Left motor direction (with reverse option)
+            if REVERSE_LEFT_MOTOR:
+                self.left_forward_pin.ChangeDutyCycle(0)   # LOW
+                self.left_backward_pin.ChangeDutyCycle(100) # HIGH
+            else:
+                self.left_forward_pin.ChangeDutyCycle(100)  # HIGH
+                self.left_backward_pin.ChangeDutyCycle(0)   # LOW
+            
+            # Right motor direction (with reverse option)
+            if REVERSE_RIGHT_MOTOR:
+                self.right_forward_pin.ChangeDutyCycle(0)   # LOW
+                self.right_backward_pin.ChangeDutyCycle(100) # HIGH
+            else:
+                self.right_forward_pin.ChangeDutyCycle(100) # HIGH
+                self.right_backward_pin.ChangeDutyCycle(0)  # LOW
         else:
             # Direct PWM method
-            self.left_pwm_forward.ChangeDutyCycle(speed)
-            self.right_pwm_forward.ChangeDutyCycle(speed)
-            self.left_pwm_backward.ChangeDutyCycle(0)
-            self.right_pwm_backward.ChangeDutyCycle(0)
+            if REVERSE_LEFT_MOTOR:
+                self.left_pwm_backward.ChangeDutyCycle(speed)
+                self.left_pwm_forward.ChangeDutyCycle(0)
+            else:
+                self.left_pwm_forward.ChangeDutyCycle(speed)
+                self.left_pwm_backward.ChangeDutyCycle(0)
+            
+            if REVERSE_RIGHT_MOTOR:
+                self.right_pwm_backward.ChangeDutyCycle(speed)
+                self.right_pwm_forward.ChangeDutyCycle(0)
+            else:
+                self.right_pwm_forward.ChangeDutyCycle(speed)
+                self.right_pwm_backward.ChangeDutyCycle(0)
         
         if duration:
             time.sleep(duration)
@@ -117,16 +138,37 @@ class MotorController:
             # ENA/ENB method: Set speed on enable pins, direction on input pins
             self.ena_pwm.ChangeDutyCycle(speed)
             self.enb_pwm.ChangeDutyCycle(speed)
-            self.left_forward_pin.ChangeDutyCycle(0)    # LOW
-            self.left_backward_pin.ChangeDutyCycle(100) # HIGH
-            self.right_forward_pin.ChangeDutyCycle(0)   # LOW
-            self.right_backward_pin.ChangeDutyCycle(100)# HIGH
+            
+            # Left motor direction (with reverse option)
+            if REVERSE_LEFT_MOTOR:
+                self.left_forward_pin.ChangeDutyCycle(100)  # HIGH
+                self.left_backward_pin.ChangeDutyCycle(0)   # LOW
+            else:
+                self.left_forward_pin.ChangeDutyCycle(0)    # LOW
+                self.left_backward_pin.ChangeDutyCycle(100) # HIGH
+            
+            # Right motor direction (with reverse option)
+            if REVERSE_RIGHT_MOTOR:
+                self.right_forward_pin.ChangeDutyCycle(100) # HIGH
+                self.right_backward_pin.ChangeDutyCycle(0)  # LOW
+            else:
+                self.right_forward_pin.ChangeDutyCycle(0)   # LOW
+                self.right_backward_pin.ChangeDutyCycle(100)# HIGH
         else:
             # Direct PWM method
-            self.left_pwm_backward.ChangeDutyCycle(speed)
-            self.right_pwm_backward.ChangeDutyCycle(speed)
-            self.left_pwm_forward.ChangeDutyCycle(0)
-            self.right_pwm_forward.ChangeDutyCycle(0)
+            if REVERSE_LEFT_MOTOR:
+                self.left_pwm_forward.ChangeDutyCycle(speed)
+                self.left_pwm_backward.ChangeDutyCycle(0)
+            else:
+                self.left_pwm_backward.ChangeDutyCycle(speed)
+                self.left_pwm_forward.ChangeDutyCycle(0)
+            
+            if REVERSE_RIGHT_MOTOR:
+                self.right_pwm_forward.ChangeDutyCycle(speed)
+                self.right_pwm_backward.ChangeDutyCycle(0)
+            else:
+                self.right_pwm_backward.ChangeDutyCycle(speed)
+                self.right_pwm_forward.ChangeDutyCycle(0)
         
         if duration:
             time.sleep(duration)
@@ -138,16 +180,37 @@ class MotorController:
             # ENA/ENB method: Left motor backward, right motor forward
             self.ena_pwm.ChangeDutyCycle(speed)
             self.enb_pwm.ChangeDutyCycle(speed)
-            self.left_forward_pin.ChangeDutyCycle(0)     # LOW
-            self.left_backward_pin.ChangeDutyCycle(100)  # HIGH
-            self.right_forward_pin.ChangeDutyCycle(100)  # HIGH
-            self.right_backward_pin.ChangeDutyCycle(0)   # LOW
+            
+            # Left motor backward (with reverse option)
+            if REVERSE_LEFT_MOTOR:
+                self.left_forward_pin.ChangeDutyCycle(100)  # HIGH
+                self.left_backward_pin.ChangeDutyCycle(0)   # LOW
+            else:
+                self.left_forward_pin.ChangeDutyCycle(0)     # LOW
+                self.left_backward_pin.ChangeDutyCycle(100)  # HIGH
+            
+            # Right motor forward (with reverse option)
+            if REVERSE_RIGHT_MOTOR:
+                self.right_forward_pin.ChangeDutyCycle(0)   # LOW
+                self.right_backward_pin.ChangeDutyCycle(100) # HIGH
+            else:
+                self.right_forward_pin.ChangeDutyCycle(100)  # HIGH
+                self.right_backward_pin.ChangeDutyCycle(0)   # LOW
         else:
             # Direct PWM method
-            self.left_pwm_backward.ChangeDutyCycle(speed)
-            self.right_pwm_forward.ChangeDutyCycle(speed)
-            self.left_pwm_forward.ChangeDutyCycle(0)
-            self.right_pwm_backward.ChangeDutyCycle(0)
+            if REVERSE_LEFT_MOTOR:
+                self.left_pwm_forward.ChangeDutyCycle(speed)
+                self.left_pwm_backward.ChangeDutyCycle(0)
+            else:
+                self.left_pwm_backward.ChangeDutyCycle(speed)
+                self.left_pwm_forward.ChangeDutyCycle(0)
+            
+            if REVERSE_RIGHT_MOTOR:
+                self.right_pwm_backward.ChangeDutyCycle(speed)
+                self.right_pwm_forward.ChangeDutyCycle(0)
+            else:
+                self.right_pwm_forward.ChangeDutyCycle(speed)
+                self.right_pwm_backward.ChangeDutyCycle(0)
         
         if duration:
             time.sleep(duration)
@@ -159,16 +222,37 @@ class MotorController:
             # ENA/ENB method: Left motor forward, right motor backward
             self.ena_pwm.ChangeDutyCycle(speed)
             self.enb_pwm.ChangeDutyCycle(speed)
-            self.left_forward_pin.ChangeDutyCycle(100)   # HIGH
-            self.left_backward_pin.ChangeDutyCycle(0)    # LOW
-            self.right_forward_pin.ChangeDutyCycle(0)    # LOW
-            self.right_backward_pin.ChangeDutyCycle(100) # HIGH
+            
+            # Left motor forward (with reverse option)
+            if REVERSE_LEFT_MOTOR:
+                self.left_forward_pin.ChangeDutyCycle(0)   # LOW
+                self.left_backward_pin.ChangeDutyCycle(100) # HIGH
+            else:
+                self.left_forward_pin.ChangeDutyCycle(100)   # HIGH
+                self.left_backward_pin.ChangeDutyCycle(0)    # LOW
+            
+            # Right motor backward (with reverse option)
+            if REVERSE_RIGHT_MOTOR:
+                self.right_forward_pin.ChangeDutyCycle(100) # HIGH
+                self.right_backward_pin.ChangeDutyCycle(0)  # LOW
+            else:
+                self.right_forward_pin.ChangeDutyCycle(0)    # LOW
+                self.right_backward_pin.ChangeDutyCycle(100) # HIGH
         else:
             # Direct PWM method
-            self.left_pwm_forward.ChangeDutyCycle(speed)
-            self.right_pwm_backward.ChangeDutyCycle(speed)
-            self.left_pwm_backward.ChangeDutyCycle(0)
-            self.right_pwm_forward.ChangeDutyCycle(0)
+            if REVERSE_LEFT_MOTOR:
+                self.left_pwm_backward.ChangeDutyCycle(speed)
+                self.left_pwm_forward.ChangeDutyCycle(0)
+            else:
+                self.left_pwm_forward.ChangeDutyCycle(speed)
+                self.left_pwm_backward.ChangeDutyCycle(0)
+            
+            if REVERSE_RIGHT_MOTOR:
+                self.right_pwm_forward.ChangeDutyCycle(speed)
+                self.right_pwm_backward.ChangeDutyCycle(0)
+            else:
+                self.right_pwm_backward.ChangeDutyCycle(speed)
+                self.right_pwm_forward.ChangeDutyCycle(0)
         
         if duration:
             time.sleep(duration)

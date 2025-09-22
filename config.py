@@ -31,6 +31,10 @@ ENA_PIN = 14  # GPIO pin for ENA (Left Motor Enable)
 ENB_PIN = 17  # GPIO pin for ENB (Right Motor Enable)
 USE_ENABLE_PINS = True  # Set to True to use ENA/ENB, False for direct PWM
 
+# Motor direction correction (if motors rotate in wrong direction)
+REVERSE_LEFT_MOTOR = False   # Set to True if left motor rotates backward when it should go forward
+REVERSE_RIGHT_MOTOR = True   # Set to True if right motor rotates backward when it should go forward
+
 # Push button configuration
 START_BUTTON_PIN = 16  # GPIO pin for start button (with pull-up resistor)
 BUTTON_DEBOUNCE_TIME = 0.1  # seconds to debounce button press
