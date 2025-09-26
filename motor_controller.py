@@ -21,14 +21,17 @@ class MotorController:
             'right_backward': MOTOR_RIGHT_BACKWARD # IN4
         }
         
-        # Initialize all motor pins as outputs
+        # Initialize all motor pins as outputs and set them LOW
         for pin in self.motor_pins.values():
             GPIO.setup(pin, GPIO.OUT)
+            GPIO.output(pin, GPIO.LOW)  # Ensure all pins start LOW
         
         # Initialize enable pins if using ENA/ENB method
         if USE_ENABLE_PINS:
             GPIO.setup(ENA_PIN, GPIO.OUT)
             GPIO.setup(ENB_PIN, GPIO.OUT)
+            GPIO.output(ENA_PIN, GPIO.LOW)  # Ensure enable pins start LOW
+            GPIO.output(ENB_PIN, GPIO.LOW)
             
             # Set up PWM for enable pins (speed control)
             self.ena_pwm = GPIO.PWM(ENA_PIN, PWM_FREQUENCY)
@@ -68,6 +71,10 @@ class MotorController:
         
         print(f"L298N voltage drop: {L298N_VOLTAGE_DROP}V")
         print(f"L298N max current: {L298N_MAX_CURRENT}A per channel")
+        
+        # Ensure all motors are stopped on startup
+        self.stop()
+        print("All motors initialized and stopped")
     
     def stop(self):
         """Stop all motors."""
@@ -86,8 +93,32 @@ class MotorController:
             self.right_pwm_forward.ChangeDutyCycle(0)
             self.right_pwm_backward.ChangeDutyCycle(0)
     
+    def ramp_up_motor(self, target_speed, ramp_time=0.5):
+        """Gradually increase motor speed to overcome starting torque."""
+        if target_speed < MIN_MOTOR_SPEED:
+            target_speed = MIN_MOTOR_SPEED
+        
+        # Start with minimum speed
+        start_speed = MIN_MOTOR_SPEED
+        steps = 10
+        step_time = ramp_time / steps
+        
+        for i in range(steps + 1):
+            current_speed = start_speed + (target_speed - start_speed) * i / steps
+            if USE_ENABLE_PINS:
+                self.ena_pwm.ChangeDutyCycle(current_speed)
+                self.enb_pwm.ChangeDutyCycle(current_speed)
+            else:
+                # For direct PWM method, we'll set the speed in the calling function
+                pass
+            time.sleep(step_time)
+    
     def move_forward(self, speed=DEFAULT_SPEED, duration=None):
         """Move the vehicle forward."""
+        # Ensure minimum speed for movement
+        if speed < MIN_MOTOR_SPEED:
+            speed = MIN_MOTOR_SPEED
+            
         if USE_ENABLE_PINS:
             # ENA/ENB method: Set speed on enable pins, direction on input pins
             self.ena_pwm.ChangeDutyCycle(speed)
@@ -268,10 +299,41 @@ class MotorController:
     
     def pivot_left(self, speed=TURN_SPEED, duration=None):
         """Pivot left (left wheel backward, right wheel forward)."""
-        self.left_pwm_backward.ChangeDutyCycle(speed)
-        self.right_pwm_forward.ChangeDutyCycle(speed)
-        self.left_pwm_forward.ChangeDutyCycle(0)
-        self.right_pwm_backward.ChangeDutyCycle(0)
+        if USE_ENABLE_PINS:
+            # ENA/ENB method: Left motor backward, right motor forward
+            self.ena_pwm.ChangeDutyCycle(speed)
+            self.enb_pwm.ChangeDutyCycle(speed)
+            
+            # Left motor backward (with reverse option)
+            if REVERSE_LEFT_MOTOR:
+                self.left_forward_pin.ChangeDutyCycle(100)  # HIGH
+                self.left_backward_pin.ChangeDutyCycle(0)   # LOW
+            else:
+                self.left_forward_pin.ChangeDutyCycle(0)     # LOW
+                self.left_backward_pin.ChangeDutyCycle(100)  # HIGH
+            
+            # Right motor forward (with reverse option)
+            if REVERSE_RIGHT_MOTOR:
+                self.right_forward_pin.ChangeDutyCycle(0)   # LOW
+                self.right_backward_pin.ChangeDutyCycle(100) # HIGH
+            else:
+                self.right_forward_pin.ChangeDutyCycle(100)  # HIGH
+                self.right_backward_pin.ChangeDutyCycle(0)   # LOW
+        else:
+            # Direct PWM method
+            if REVERSE_LEFT_MOTOR:
+                self.left_pwm_forward.ChangeDutyCycle(speed)
+                self.left_pwm_backward.ChangeDutyCycle(0)
+            else:
+                self.left_pwm_backward.ChangeDutyCycle(speed)
+                self.left_pwm_forward.ChangeDutyCycle(0)
+            
+            if REVERSE_RIGHT_MOTOR:
+                self.right_pwm_backward.ChangeDutyCycle(speed)
+                self.right_pwm_forward.ChangeDutyCycle(0)
+            else:
+                self.right_pwm_forward.ChangeDutyCycle(speed)
+                self.right_pwm_backward.ChangeDutyCycle(0)
         
         if duration:
             time.sleep(duration)
@@ -279,10 +341,41 @@ class MotorController:
     
     def pivot_right(self, speed=TURN_SPEED, duration=None):
         """Pivot right (left wheel forward, right wheel backward)."""
-        self.left_pwm_forward.ChangeDutyCycle(speed)
-        self.right_pwm_backward.ChangeDutyCycle(speed)
-        self.left_pwm_backward.ChangeDutyCycle(0)
-        self.right_pwm_forward.ChangeDutyCycle(0)
+        if USE_ENABLE_PINS:
+            # ENA/ENB method: Left motor forward, right motor backward
+            self.ena_pwm.ChangeDutyCycle(speed)
+            self.enb_pwm.ChangeDutyCycle(speed)
+            
+            # Left motor forward (with reverse option)
+            if REVERSE_LEFT_MOTOR:
+                self.left_forward_pin.ChangeDutyCycle(0)   # LOW
+                self.left_backward_pin.ChangeDutyCycle(100) # HIGH
+            else:
+                self.left_forward_pin.ChangeDutyCycle(100)   # HIGH
+                self.left_backward_pin.ChangeDutyCycle(0)    # LOW
+            
+            # Right motor backward (with reverse option)
+            if REVERSE_RIGHT_MOTOR:
+                self.right_forward_pin.ChangeDutyCycle(100) # HIGH
+                self.right_backward_pin.ChangeDutyCycle(0)  # LOW
+            else:
+                self.right_forward_pin.ChangeDutyCycle(0)    # LOW
+                self.right_backward_pin.ChangeDutyCycle(100) # HIGH
+        else:
+            # Direct PWM method
+            if REVERSE_LEFT_MOTOR:
+                self.left_pwm_backward.ChangeDutyCycle(speed)
+                self.left_pwm_forward.ChangeDutyCycle(0)
+            else:
+                self.left_pwm_forward.ChangeDutyCycle(speed)
+                self.left_pwm_backward.ChangeDutyCycle(0)
+            
+            if REVERSE_RIGHT_MOTOR:
+                self.right_pwm_forward.ChangeDutyCycle(speed)
+                self.right_pwm_backward.ChangeDutyCycle(0)
+            else:
+                self.right_pwm_backward.ChangeDutyCycle(speed)
+                self.right_pwm_forward.ChangeDutyCycle(0)
         
         if duration:
             time.sleep(duration)
@@ -329,22 +422,87 @@ class MotorController:
     
     def cleanup(self):
         """Clean up GPIO resources."""
-        self.stop()
-        
-        if USE_ENABLE_PINS:
-            # Clean up ENA/ENB method PWM
-            self.ena_pwm.stop()
-            self.enb_pwm.stop()
-            self.left_forward_pin.stop()
-            self.left_backward_pin.stop()
-            self.right_forward_pin.stop()
-            self.right_backward_pin.stop()
-        else:
-            # Clean up direct PWM method
-            self.left_pwm_forward.stop()
-            self.left_pwm_backward.stop()
-            self.right_pwm_forward.stop()
-            self.right_pwm_backward.stop()
-        
-        GPIO.cleanup()
-        print("Motor controller cleaned up")
+        try:
+            self.stop()
+            
+            if USE_ENABLE_PINS:
+                # Clean up ENA/ENB method PWM
+                if hasattr(self, 'ena_pwm') and self.ena_pwm is not None:
+                    try:
+                        self.ena_pwm.stop()
+                    except:
+                        pass
+                if hasattr(self, 'enb_pwm') and self.enb_pwm is not None:
+                    try:
+                        self.enb_pwm.stop()
+                    except:
+                        pass
+                if hasattr(self, 'left_forward_pin') and self.left_forward_pin is not None:
+                    try:
+                        self.left_forward_pin.stop()
+                    except:
+                        pass
+                if hasattr(self, 'left_backward_pin') and self.left_backward_pin is not None:
+                    try:
+                        self.left_backward_pin.stop()
+                    except:
+                        pass
+                if hasattr(self, 'right_forward_pin') and self.right_forward_pin is not None:
+                    try:
+                        self.right_forward_pin.stop()
+                    except:
+                        pass
+                if hasattr(self, 'right_backward_pin') and self.right_backward_pin is not None:
+                    try:
+                        self.right_backward_pin.stop()
+                    except:
+                        pass
+            else:
+                # Clean up direct PWM method
+                if hasattr(self, 'left_pwm_forward') and self.left_pwm_forward is not None:
+                    try:
+                        self.left_pwm_forward.stop()
+                    except:
+                        pass
+                if hasattr(self, 'left_pwm_backward') and self.left_pwm_backward is not None:
+                    try:
+                        self.left_pwm_backward.stop()
+                    except:
+                        pass
+                if hasattr(self, 'right_pwm_forward') and self.right_pwm_forward is not None:
+                    try:
+                        self.right_pwm_forward.stop()
+                    except:
+                        pass
+                if hasattr(self, 'right_pwm_backward') and self.right_pwm_backward is not None:
+                    try:
+                        self.right_pwm_backward.stop()
+                    except:
+                        pass
+            
+            # Set all pins to LOW before cleanup
+            try:
+                for pin in [MOTOR_LEFT_FORWARD, MOTOR_LEFT_BACKWARD, MOTOR_RIGHT_FORWARD, MOTOR_RIGHT_BACKWARD]:
+                    GPIO.output(pin, GPIO.LOW)
+                if USE_ENABLE_PINS:
+                    GPIO.output(ENA_PIN, GPIO.LOW)
+                    GPIO.output(ENB_PIN, GPIO.LOW)
+            except:
+                pass
+            
+            GPIO.cleanup()
+            print("Motor controller cleaned up")
+        except Exception as e:
+            # Silent cleanup - don't print warnings
+            try:
+                GPIO.cleanup()
+            except:
+                pass
+    
+    def __enter__(self):
+        """Context manager entry."""
+        return self
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Context manager exit - ensures cleanup."""
+        self.cleanup()

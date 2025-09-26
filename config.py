@@ -2,10 +2,13 @@
 Configuration file for the robotic vehicle navigation system.
 """
 
-# Camera settings
+# Camera settings - Optimized for Pi Camera v1 (OV5647)
 CAMERA_WIDTH = 640
 CAMERA_HEIGHT = 480
 CAMERA_FPS = 30
+CAMERA_SENSOR_MODE = 2  # Mode 2: 640x480@60fps for Pi Camera v1
+CAMERA_ISO = 100  # Lower ISO for better image quality
+CAMERA_EXPOSURE_MODE = 'auto'  # Auto exposure for varying lighting
 
 # Grid settings
 GRID_ROWS = 4
@@ -54,7 +57,8 @@ PI_VOLTAGE = 5.0           # Voltage for Raspberry Pi (V)
 
 # PWM settings for motor speed control
 PWM_FREQUENCY = 1000
-DEFAULT_SPEED = 40  # PWM duty cycle (0-100) - reduced for geared motors
+DEFAULT_SPEED = 50  # PWM duty cycle (0-100) - increased for geared motors
+MIN_MOTOR_SPEED = 40  # Minimum speed to overcome starting torque
 
 # Motor specifications (130-type geared motors, 1:120 ratio)
 MOTOR_RATED_VOLTAGE = 6.0  # V
@@ -70,8 +74,8 @@ DISTANCE_PER_REVOLUTION_CM = WHEEL_CIRCUMFERENCE_CM
 # Navigation settings optimized for 50cm grid cells
 TURN_ANGLE = 90  # degrees
 MOVE_DISTANCE_CM = GRID_CELL_SIZE_CM  # 50cm per grid cell
-TURN_SPEED = 25  # PWM duty cycle for turning (reduced for precision)
-FORWARD_SPEED = 35  # PWM duty cycle for forward movement (reduced for control)
+TURN_SPEED = 45  # PWM duty cycle for turning (increased for movement)
+FORWARD_SPEED = 50  # PWM duty cycle for forward movement (increased for movement)
 
 # Timing calculations for 50cm grid cells
 # At 1.33 rpm (0.022 rps), it takes ~45 seconds for one full wheel revolution

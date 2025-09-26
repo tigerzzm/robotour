@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Sync script to push changes from Mac to Raspberry Pi
-# Usage: ./sync_to_pi.sh [commit_message]
+# Sync script to push changes to Raspberry Pi using scp
+# Usage: ./sync_to_pi.sh [optional_sync_message]
 
 echo "=== Syncing Robotour to Raspberry Pi ==="
 
@@ -11,38 +11,51 @@ if [ ! -f "main_controller.py" ]; then
     exit 1
 fi
 
-# Get commit message
+# Get sync message
 if [ -z "$1" ]; then
-    echo "Enter commit message (or press Enter for default):"
-    read -r commit_msg
-    if [ -z "$commit_msg" ]; then
-        commit_msg="Update from Mac $(date '+%Y-%m-%d %H:%M:%S')"
-    fi
+    sync_msg="Sync from $(hostname) $(date '+%Y-%m-%d %H:%M:%S')"
 else
-    commit_msg="$1"
+    sync_msg="Sync: $1"
 fi
 
-echo "Commit message: $commit_msg"
+echo "Sync message: $sync_msg"
 
-# Commit and push to GitHub
-echo "1. Committing changes to git..."
-git add .
-git commit -m "$commit_msg"
-git push origin main
+# Create directory on Pi if it doesn't exist
+echo "1. Creating /robotour directory on Pi..."
+ssh robo@tiger.local "sudo mkdir -p /robotour && sudo chown robo:robo /robotour"
 
 if [ $? -ne 0 ]; then
-    echo "Error: Failed to push to GitHub"
+    echo "Error: Failed to create directory on Pi"
     exit 1
 fi
 
-echo "2. Pushing to Raspberry Pi..."
-ssh robo@tiger.local "cd /robotour && git pull origin main"
+# Sync Python files
+echo "2. Syncing Python files..."
+scp *.py robo@tiger.local:/robotour/
+
+if [ $? -ne 0 ]; then
+    echo "Error: Failed to sync Python files"
+    exit 1
+fi
+
+# Sync configuration and documentation files
+echo "3. Syncing config and documentation files..."
+scp *.md *.txt *.sh robo@tiger.local:/robotour/
+
+if [ $? -ne 0 ]; then
+    echo "Error: Failed to sync config/documentation files"
+    exit 1
+fi
+
+# Fix line endings and make files executable on Pi
+echo "4. Fixing line endings and setting permissions..."
+ssh robo@tiger.local "cd /robotour && dos2unix *.sh 2>/dev/null || true && chmod +x *.py *.sh"
 
 if [ $? -eq 0 ]; then
     echo "✅ Successfully synced to Raspberry Pi!"
-    echo "You can now SSH to your Pi and run the updated code."
+    echo "Sync completed: $sync_msg"
 else
-    echo "❌ Failed to sync to Raspberry Pi"
+    echo "❌ Failed to set file permissions on Raspberry Pi"
     exit 1
 fi
 
